@@ -1,0 +1,60 @@
+﻿<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opencv JS</title>
+    <script async src="js/opencv.js" onload="openCvReady();"></script>
+    <script src="js/utils.js"></script>
+    <script src ="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+    <video id="cam_input" height="480" width="640"></video>
+    <canvas id="canvas_output" height="480" width="640"></canvas>
+</body>
+<script type="text/JavaScript">
+function openCvReady() {
+   cv['onRuntimeInitialized'] = () =>{
+    //let dst = new cv.Mat(video.height, video.width, cv.CV_8UC1);
+       //let gray = new cv.Mat();
+       let video = document.getElementById("cam_input");
+       navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(function (stream) {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(function (err) {
+            console.log("An error occurred! " + err);
+        });
+       console.log("good")
+       function postData(file) {
+           let formdata = new FormData();
+           formdata.append("image", file);
+           //console.log(formdata);
+           const Http = new XMLHttpRequest();
+           const url = 'http://127.0.0.1:8080/process_image';
+           Http.open("POST", url);
+           //Http.setRequestHeader('Access-Control-Allow-Origin', '*');
+           Http.send(formdata);
+           Http.onreadystatechange = (e) => {
+               console.log(Http.response)
+           }
+       }
+       const FPS = 1;
+       function processVideo() {
+           //console.log("in process video")
+           let begin = Date.now();
+           let canvas_output = document.getElementById("canvas_output");
+           canvas_output.getContext('2d').drawImage(cam_input, 0, 0, cam_input.width, cam_input.height);
+           //let image_data_url = canvas_output.toDataURL('image/png');
+           canvas_output.toBlob(postData, 'image/png');     
+           //postData(image_data_url);
+           // schedule next one.
+           let delay = 1000 / FPS - (Date.now() - begin);
+           setTimeout(processVideo, delay);
+       }
+       // schedule first one.
+       setTimeout(processVideo, 0);
+   };
+  };
+</script>
+</html>
