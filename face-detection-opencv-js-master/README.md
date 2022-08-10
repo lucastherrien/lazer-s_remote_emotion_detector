@@ -1,8 +1,4 @@
-# face-detection-opencv-js
+# lazer's remote emotion detector
 
-
-To test this copy or clone all the files with same directory structure and serve from the directory where 'index.html' file is located.
-
-e.g:
-
-$ python -m http.server
+Uses JavaScript to send a webcam stream to a python script on my gaming desktop which uses its RTX 3060 to evaluate the sent image using a neural network.
+A response is sent back containing which of the 7 emotions the model was trained to predict is most likely to be expressed by the person in the webcam.
